@@ -1,0 +1,9 @@
+1) install the requests and beautifulsoup library using pip install.Got connection with website and retrieve the html 
+   code by using requests.get() and content respectively
+2) beautifulsoup used to modify the scrap data which is got by requests.htmlparser convert scrap data into html readable 
+   format.datas1.find_all("h3",class_="title") h3 is html tag name, class contains the data.Find_all find all datas, related 
+   to this tag and class in the given  website
+3) datas.txt give only string in this tag and class.After cleaned the datas, store all datas in a particular list.
+4) All scraped datas convert to tuple and stored in a particular list
+5) Using my_sql DBMS,loaded the scraped datas in the database by using Create table and insert operation using sql.
+Datas are scraped from https://www.thehindu.com/latest-news/ url
