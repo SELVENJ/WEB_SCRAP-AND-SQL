@@ -1,0 +1,144 @@
+pip install requests
+pip install beautifulsoup4
+# connect with the url
+import requests
+datas=requests.get(r"https://www.thehindu.com/latest-news/")
+# Get datas from url in html 
+datas.content
+from bs4 import BeautifulSoup as bs
+datas1=bs(datas.text,"html.parser")
+# Get required datas only in the url using beautifulsoup4
+res=datas1.find_all("h3",class_="title")
+# Storing the retrieved data in list
+Headlines=[]
+for i in res:
+    a=i.text.strip()
+    Headlines.append(a)
+print(Headlines)
+res2=datas1.find_all("div",class_="author-name")
+Author_name=[]
+for i in res2:
+    a=i.text.strip()
+    Author_name.append(a)
+print(Author_name)
+res3=datas1.find_all("div",class_="label")
+Place=[]
+for i in res3:
+    a=i.text.strip()
+    Place.append(a)
+print(Place)
+# Storing the list of tuple datas which retrieved from the url
+Lists=[]
+for i in range(len(Headlines)):
+    res=tuple((Headlines[i],Author_name[i],Place[i]))
+    Lists.append(res)
+# Storing multiple datas in text format in a particular file
+File_name=r"C:\Users\KK COMPUTERS\Desktop\DSA\news_Data.txt"
+for i in Lists:
+    try:
+        with open(File_name,"a") as file:
+            file.write(str(i)+","+"\n")
+    except Exception:
+        pass
+file.close()
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+# Loading datas in database using Mysql DBMS
+!pip install mysql-connector-python
+import mysql.connector
+from mysql.connector import Error
+import pandas as pd
+def create_server_connection(host_name, user_name, user_password):
+    try:
+        connection = mysql.connector.connect(
+        host=host_name,
+        user=user_name,
+        passwd=user_password)
+        print("MySQL Database connection successful")
+    except Error as err:
+        print(f"Error: '{err}'")
+
+    return connection
+
+pw = "Tham@123" # IMPORTANT! Put your MySQL Terminal password here.
+# db = "school" # This is the name of the database we will create in the next step - call it whatever you like.
+
+connection = create_server_connection("127.0.0.1", "root", pw)
+
+
+# CREATE FUNCTION FOR EXECUTION QUERY
+def create_database(connection, query):
+    cursor = connection.cursor()
+    
+    try:
+        cursor.execute(query)
+        print("DB created successfully!!!")
+    except Error as e:
+        print(e)
+        
+create_database_query = "CREATE DATABASE News_contents" #SQL -> CREATE DATABASE <name of the database>
+create_database(connection, create_database_query)
+
+def create_db_connection(host_name, user_name, user_password, db_name,):
+    connection = None
+    try:
+        connection = mysql.connector.connect(
+            host=host_name,
+            user=user_name,
+            passwd=user_password,
+            database=db_name
+        )
+        print("MySQL Database connection successful")
+    except Error as err:
+        print(f"Error: '{err}'")
+
+    return connection
+
+def execute_query(connection, query):
+    cursor = connection.cursor()
+    try:
+        cursor.execute(query)
+        connection.commit()
+        print("Query successful")
+    except Error as err:
+        print(f"Error: '{err}'")
+        
+
+# CREATING A TABLE IN DATABASE
+Hindu_news="""CREATE TABLE Hindu_News(
+                                 Headlines VARCHAR(1000) ,
+                                 Author_name VARCHAR(1000),
+                                 Place VARCHAR(100));"""
+
+connection = create_db_connection("localhost", "root", pw, "News_contents" ) # Connect to the Database
+execute_query(connection,Hindu_news) # Execute our defined query
+
+# Insert the datas stored in the text file
+Insert_valus="""INSERT INTO Hindu_news VALUES
+                          ----------
+                          ----------
+                          ---------- ;"""
+
+connection = create_db_connection("localhost", "root", pw, "News_contents" ) # Connect to the Database
+execute_query(connection,Insert_valus) # Execute our defined query
+
+# writing query for read operation 
+def read_query(connection, query):
+    cursor = connection.cursor()
+    result = None
+    try:
+        cursor.execute(query)
+        result = cursor.fetchall()
+        return result
+    except Error as err:
+        print(f"Error: '{err}'")
+        
+READ_OPERATION="""
+SELECT * 
+FROM Hindu_News;
+"""
+connection = create_db_connection("localhost", "root", pw, "News_contents" ) 
+fetched_data=read_query(connection, READ_OPERATION) 
+for i in fetched_data:
+    print(i)
